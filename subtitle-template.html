@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>subtitle-responsive.html</title>
+  <style type="text/css">
+    html {
+        /* Explicitly set background color */
+        background-color: transparent;
+
+        /* Set default box-sizing to border-box for easier sizing of elements */
+        box-sizing: border-box;
+
+        /* Disable scrollbars by clipping page overflow */
+        overflow: hidden;
+
+        /* Set default font family */
+        font-family: Verdana, Geneva, sans-serif;
+    }
+    *, *:before, *:after {
+        /* Make box-sizing property easy to change by components if required */
+        box-sizing: inherit;
+    }
+    .overlay {
+    /* Initially hide the overlay */
+    opacity: 0;
+
+    /* Position overlay with equal margin to the left and bottom, 96px at 1080p */
+    position: absolute;
+    left: 5vmax;
+    bottom: 5vmax;
+    
+    /* Set a max-width to prevent going over the right margin at 100% - 2 * margin, 1728px at 1080p */
+    max-width: calc(100vw - 2 * 5vmax);
+}
+
+html {
+    /* Set responsive root font size to 43.2px at 1080p */
+    font-size: 4vh;
+}
+
+.line-1 {
+    /* Calculated font size is 43.3px */
+    font-size: 1.0rem;
+}
+
+.line-2 {
+    /* Calculated font size is 43.3px */
+    font-size: 1.0rem;
+}
+.line {
+    /* Define padding relative to the font size */
+    padding: 0.2em;
+    color: white;
+    background-color: #0000002F;
+    
+    /* Prevent text wrapping and overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 0.1em;
+}
+</style>
+</head>
+<body>  
+  <div class="overlay">
+    <div id="line1" class="line line-1">Lorem ipsum dolor sit amet, consetetur sadipscing elitr,</div>
+    <div id="line2" class="line line-2">sed diam nonumy eirmod tempor invidunt ut labore et dolore magna </div>
+  </div>
+  <script>  
+  function play () {
+    const overlay = document.querySelector('.overlay')
+    overlay.style.opacity = 1
+  }
+
+  function stop () {
+    const overlay = document.querySelector('.overlay')
+    overlay.style.opacity = 0
+  }
+  
+  function next() {
+    //log('next()');
+  }
+  
+  function update(data) {
+    //console.log('update() ' + typeof data + "  " + data);
+    //console.log('arguments' + JSON.stringify(data));
+    let object = JSON.parse(data);
+    const line1 = document.getElementById('line1');
+    const line2 = document.getElementById('line2');
+    line1.innerText = object.line1;
+    line2.innerText = object.line2;
+    if(line1.innerText === ""){
+      line1.style.opacity = 0;
+    } else {
+      line1.style.opacity = 1;
+    }
+    if(line2.innerText === ""){
+      line2.style.opacity = 0;
+    } else {
+      line2.style.opacity = 1;
+    }
+  }
+  
+  // function remove() {
+  //   log('remove()');
+  // }
+  
+  function action1() {
+    //log('action1() ' + JSON.stringify(arguments));
+  }
+  
+  window.onerror = function(msg) {
+    //log('error ' + msg);    
+  }
+  
+  /*function log(s) {
+    console.log(s)
+    const li = document.createElement('li');
+    li.innerText = s;
+    document.body.querySelector('ul').appendChild(li);
+  }*/
+  
+  //log(window.location)
+  //log('Chrome: ' + window.navigator.userAgent.match(/Chrome\/([^ ]+)/)[1])
+  //log('window.caspar: ' + !!window.caspar)
+  //log('html.backgroundColor: ' + window.getComputedStyle(document.getElementsByTagName('html')[0]).backgroundColor)
+  //log('body.backgroundColor: ' + window.getComputedStyle(document.getElementsByTagName('body')[0]).backgroundColor)
+  </script>
+</body>
+</html>

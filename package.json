@@ -1,0 +1,16 @@
+{
+  "name": "subtitler",
+  "version": "1.0.0",
+  "description": "Shows subtitles for CasperCG",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daniel Schick",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "casparcg-connection": "^5.0.1",
+    "telnet-client": "^1.4.6",
+    "tslib": "^2.0.3"
+  }
+}
