@@ -58,8 +58,8 @@ const server = http.createServer(((req, res) => {
         if (query.songNumber!== undefined) {
             console.log("song requested");
             res.statusCode = 200;
-            res.setHeader("Content-type", "text/html");
-            res.write(JSON.stringify(createLinesetsFromSong(query.songNumber)));
+            res.setHeader("Content-type", "text/html");           
+            res.write(JSON.stringify(createLinesetsFromSong(query.songNumber, query.songBook)));
             res.end();
         } else {
             console.log("bad Request detected");
@@ -73,21 +73,30 @@ server.listen(port, address, () => {
     console.log("Server started at " + address + ":" + port);
 });
 
-let rawdata = fs.readFileSync('WDH.json');
-let songs = JSON.parse(rawdata);
+let rawdataDE = fs.readFileSync('WDH.json');
+let rawdataNO = fs.readFileSync('HV.json');
+let songsDE = JSON.parse(rawdataDE);
+let songsNO = JSON.parse(rawdataNO);
 let con = new CasparCG();
 // host = 127.0.0.1, port = 5250, autoConnect = true ...
 
-let createLinesetsFromSong = function (songNumber){
+let createLinesetsFromSong = function (songNumber, file){
 
-    let song = songs[songNumber-1];
+    let song = null;
+
+    if(file === "HV"){
+        song = songsNO[songNumber-1];    
+    } else {
+        song = songsDE[songNumber-1];
+    }
+    
     let lineSets = [];
     let emptySet = {
         "line1": "",
         "line2": ""
     }
 
-    if(songNumber < 1 || songNumber > songs.length || isNaN(songNumber)){
+    if(songNumber < 1 || songNumber > songsDE.length || isNaN(songNumber)){
         return lineSets.push(emptySet);
     }
 
@@ -132,8 +141,8 @@ lineSetTest = {
 }
 
 lineSet = {
-    "line1": songs[364].verses[0].lines.split('\n')[0],
-    "line2": songs[364].verses[0].lines.split('\n')[1],
+    "line1": songsDE[364].verses[0].lines.split('\n')[0],
+    "line2": songsDE[364].verses[0].lines.split('\n')[1],
 }
 con.cgAdd(1,20,1,'subtitle-template', true, lineSetTest);
 

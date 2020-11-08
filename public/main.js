@@ -4,6 +4,8 @@ const submit = document.getElementById('submit');
 const songNumber = document.getElementById('songNumber');
 const requestSong = document.getElementById('requestSong');
 const table = document.getElementById("lines");
+const wdh = document.getElementById("WDH");
+const hv = document.getElementById("HV");
 
 let currentLine = 0;
 let lineSets = null;
@@ -31,7 +33,13 @@ requestSong.addEventListener('click', (e) => {
           fillList();
       }
     };
-    xHttp.open("GET", `?songNumber=${songNumber.value}`, true);
+    let book = "";
+    if(hv.checked){
+        book = "HV";
+    } else {
+        book = "WDH";
+    }
+    xHttp.open("GET", `?songNumber=${songNumber.value}&songBook=${book}`, true);
     console.log(xHttp);
     xHttp.send(null);
  });
@@ -86,16 +94,12 @@ songNumber.addEventListener("keydown", (e) => {
         e = e || window.event;
         switch (e.key) {
             case "ArrowLeft":
-                // Left pressed
-                break;
-            case "ArrowRight":
-                // Right pressed
-                break;
             case "ArrowUp":
                 if(currentLine > 0){
                     showlineSetAt(currentLine-1);
                 }
                 break;
+            case "ArrowRight":
             case "ArrowDown":
                 if(currentLine < lineSets.length - 1){
                     showlineSetAt(currentLine+1);
