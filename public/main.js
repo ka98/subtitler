@@ -36,6 +36,13 @@ requestSong.addEventListener('click', (e) => {
     xHttp.send(null);
  });
 
+songNumber.addEventListener("keydown", (e) => {
+    if(e.key === "Enter"){
+        e.preventDefault();
+        requestSong.click();
+    }
+});
+
  function showlineSetAt(index){
     let xHttp = new XMLHttpRequest();
     xHttp.onreadystatechange = () => {
