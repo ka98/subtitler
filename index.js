@@ -3,6 +3,7 @@ const fs = require('fs');
 const http = require("http");
 const url = require("url");
 const os = require("os");
+const open = require("open");
 
 const interfaces = os.networkInterfaces();
 const addresses = [];
@@ -181,6 +182,8 @@ lineSet = {
     "line2": songsDE[364].verses[0].lines.split('\n')[1],
 }
 con.cgAdd(1,20,1,'subtitle-template', true, lineSetTest);
+
+open("http://" + address + ":" + port, {allowNonzeroExitCode: true});
 
 //con.disconnect();
 
