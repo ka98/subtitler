@@ -2,8 +2,27 @@ const {CasparCG} = require('casparcg-connection');
 const fs = require('fs');
 const http = require("http");
 const url = require("url");
+const os = require("os");
 
-const address = "127.0.0.1";
+const interfaces = os.networkInterfaces();
+const addresses = [];
+let address;
+let input;
+while (address == undefined){
+    console.clear();
+    console.log("Choose Network Interface: \n");
+    let i = 1; 
+    for(let interface in interfaces){
+        console.log(`[${i}] ${interface} ${interfaces[interface][interfaces[interface].length-1].cidr}`);
+        addresses.push(interfaces[interface][interfaces[interface].length-1].address);
+        i++; 
+    }
+
+    const inputReader = require('wait-console-input')
+    input = inputReader.readInteger('');
+    address = addresses[parseInt(input) - 1];
+}
+
 const port = "3000";
 
 const server = http.createServer(((req, res) => {
@@ -44,7 +63,7 @@ const server = http.createServer(((req, res) => {
     } else {
         let query = url.parse(req.url, true).query;
         if (query.line1 !== undefined && query.line2 !== undefined) {
-            console.log("subtitle requested");
+            console.log(`Subtitle requestet \n"${query.line1}"\n"${query.line2}"`);
             res.statusCode = 200;
             res.setHeader("Content-type", "text/html");
             let lineSet = {
@@ -56,13 +75,13 @@ const server = http.createServer(((req, res) => {
             res.end();
         }
         if (query.songNumber!== undefined) {
-            console.log("song requested");
+            console.log("song requested: " + query.songNumber + " Book: " + query.songBook);
             res.statusCode = 200;
             res.setHeader("Content-type", "text/html");           
             res.write(JSON.stringify(createLinesetsFromSong(query.songNumber, query.songBook)));
             res.end();
         } else {
-            console.log("bad Request detected");
+            //console.log("bad Request detected");
             res.statusCode = 400;
             res.end();
         }
@@ -86,6 +105,12 @@ let createLinesetsFromSong = function (songNumber, file){
 
     let song = null;
 
+    let lineSets = [];
+    let emptySet = {
+        "line1": "",
+        "line2": ""
+    }
+
     if(songNumber < 1 || songNumber > 1000 || isNaN(songNumber)){
         console.log("number out of range or not a number");
         return lineSets.push(emptySet);
@@ -106,14 +131,12 @@ let createLinesetsFromSong = function (songNumber, file){
     } else {
         song = songsDE[songNumber-1];
     }
-    
-    let lineSets = [];
-    let emptySet = {
-        "line1": "",
-        "line2": ""
-    }
 
     let refrain = null;
+
+    if(song === null){
+        return emptySet;
+    }
 
     for(let i = 0; i < song.verses.length; i++){
         let vers = song.verses[i];
@@ -149,8 +172,8 @@ let createLinesetsFromSong = function (songNumber, file){
 }
 
 lineSetTest = {
-    "line1": "das ist Timo",
-    "line2": "er fragt sich wahrschienlich noch heute, wann denn der Witz kommt"
+    "line1": "",
+    "line2": ""
 }
 
 lineSet = {
