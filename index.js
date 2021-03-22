@@ -75,8 +75,10 @@ server.listen(port, address, () => {
 
 let rawdataDE = fs.readFileSync('WDH.json');
 let rawdataNO = fs.readFileSync('HV.json');
+let rawdataFMB = fs.readFileSync('FMB.json');
 let songsDE = JSON.parse(rawdataDE);
 let songsNO = JSON.parse(rawdataNO);
+let songsFMB = JSON.parse(rawdataFMB);
 let con = new CasparCG();
 // host = 127.0.0.1, port = 5250, autoConnect = true ...
 
@@ -84,8 +86,23 @@ let createLinesetsFromSong = function (songNumber, file){
 
     let song = null;
 
+    if(songNumber < 1 || songNumber > 1000 || isNaN(songNumber)){
+        console.log("number out of range or not a number");
+        return lineSets.push(emptySet);
+    }
+
     if(file === "HV"){
         song = songsNO[songNumber-1];    
+    } else if (file === "FMB"){
+        for(let i = 0; i < songsFMB.length; i++){
+            if(songsFMB[i].songNumber === '497'){
+                console.log("found it!");
+            }
+            if(songsFMB[i].songNumber === songNumber.toString()){
+                song = songsFMB[i];
+                break;
+            }
+        }
     } else {
         song = songsDE[songNumber-1];
     }
@@ -94,10 +111,6 @@ let createLinesetsFromSong = function (songNumber, file){
     let emptySet = {
         "line1": "",
         "line2": ""
-    }
-
-    if(songNumber < 1 || songNumber > songsDE.length || isNaN(songNumber)){
-        return lineSets.push(emptySet);
     }
 
     let refrain = null;

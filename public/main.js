@@ -6,6 +6,7 @@ const requestSong = document.getElementById('requestSong');
 const table = document.getElementById("lines");
 const wdh = document.getElementById("WDH");
 const hv = document.getElementById("HV");
+const fmb = document.getElementById("FMB");
 
 let currentLine = 0;
 let lineSets = null;
@@ -36,6 +37,8 @@ requestSong.addEventListener('click', (e) => {
     let book = "";
     if(hv.checked){
         book = "HV";
+    } else if (fmb.checked){
+        book = "FMB";
     } else {
         book = "WDH";
     }
