@@ -24,6 +24,7 @@ while (address == undefined){
     address = addresses[parseInt(input) - 1];
 }
 
+//address = "127.0.0.1"; use when debugging in VSCode
 const port = "3000";
 
 const server = http.createServer(((req, res) => {
@@ -74,13 +75,46 @@ const server = http.createServer(((req, res) => {
             con.cgUpdate(1,20,1, lineSet);
             res.write("done!")
             res.end();
-        }
-        if (query.songNumber!== undefined) {
+        } else if (query.autoComplete !== undefined) {
+            console.log("autocomplete requested");
+            res.statusCode = 200;
+            res.setHeader("Content-type", "text/html");
+            let array = new Array();
+            for(let i = 0; i < customLines.length; i++){
+                array.push(customLines[i].title);
+            }
+            res.write(JSON.stringify(array));
+            res.end();
+
+        } else if (query.songNumber!== undefined) {
             console.log("song requested: " + query.songNumber + " Book: " + query.songBook);
             res.statusCode = 200;
-            res.setHeader("Content-type", "text/html");           
-            res.write(JSON.stringify(createLinesetsFromSong(query.songNumber, query.songBook)));
+            res.setHeader("Content-type", "tµµext/html");
+            if(query.songBook === "custom"){
+                for(let i = 0; i < customLines.length; i++) {
+                    if(query.songNumber === customLines[i].title){
+                        res.write(JSON.stringify(customLines[i].lines));
+                        break;
+                    }
+                }
+            } else {
+                res.write(JSON.stringify(createLinesetsFromSong(query.songNumber, query.songBook)));
+            }
             res.end();
+        } else if (query.newCustom !== undefined) {
+            if(query.oldTitle !== undefined){
+                for(let i = 0; i < customLines.length; i++){
+                    if(customLines[i].title === query.oldTitle){
+                        customLines[i] = JSON.parse(query.newCustom);
+                        break;
+                    }
+                }
+            } else {
+                customLines.push(query.custom);
+            }
+
+            fs.writeFileSync(resourcesFolder + 'Custom.json', JSON.stringify(customLines, null, 2));
+
         } else {
             //console.log("bad Request detected");
             res.statusCode = 400;
@@ -93,12 +127,15 @@ server.listen(port, address, () => {
     console.log("Server started at " + address + ":" + port);
 });
 
-let rawdataDE = fs.readFileSync('WDH.json');
-let rawdataNO = fs.readFileSync('HV.json');
-let rawdataFMB = fs.readFileSync('FMB.json');
+let resourcesFolder = './resources/'
+let rawdataDE = fs.readFileSync(resourcesFolder + 'WDH.json');
+let rawdataNO = fs.readFileSync(resourcesFolder +'HV.json');
+let rawdataFMB = fs.readFileSync(resourcesFolder +'FMB.json');
+let rawdataCustom = fs.readFileSync(resourcesFolder +'Custom.json');
 let songsDE = JSON.parse(rawdataDE);
 let songsNO = JSON.parse(rawdataNO);
 let songsFMB = JSON.parse(rawdataFMB);
+let customLines = JSON.parse(rawdataCustom);
 let con = new CasparCG();
 // host = 127.0.0.1, port = 5250, autoConnect = true ...
 
