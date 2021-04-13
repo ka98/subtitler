@@ -10,7 +10,7 @@ const fmb = document.getElementById("FMB");
 const autocomplete = document.getElementById("autoComplete");
 const requestCustom = document.getElementById("requestCustom");
 const editCustom = document.getElementById("editCustom");
-const createNewCustom = document.getElementById("createNewCustom");
+const createCustom = document.getElementById("createCustom");
 const customLineset = document.getElementById("customLineset");
 const save = document.getElementById("save");
 
@@ -18,6 +18,21 @@ let oldTitle = '';
 let currentLine = 0;
 let lineSets = null;
 let highlight = null
+
+newCustomTemplate = [
+    {
+      "line1": "",
+      "line2": ""
+    },
+    {
+      "line1": "",
+      "line2": ""
+    },
+    {
+      "line1": "",
+      "line2": ""
+    }
+]
 
 fillAutoComplete();
 
@@ -42,6 +57,7 @@ save.addEventListener('click', (e) => {
     xHttp.onreadystatechange = () => {
       if (xHttp.readyState === 4 && xHttp.status === 200){
           console.log(xHttp.responseText);
+          fillAutoComplete();
       }
     };
     xHttp.open("GET", `?oldTitle=${oldTitle}&newCustom=${JSON.stringify(custom)}`, true);
@@ -129,19 +145,10 @@ songNumber.addEventListener("keydown", (e) => {
     }
 });
 
-createNewCustom.addEventListener('click', (e) => {
-    let xHttp = new XMLHttpRequest();
-    xHttp.onreadystatechange = () => {
-      if (xHttp.readyState === 4 && xHttp.status === 200){
-          console.log(xHttp.responseText);
-          clearList();
-          lineSets = JSON.parse(xHttp.responseText);
-          fillList(false);
-      }
-    };
-    xHttp.open("GET", `?songNumber=${customLineset.value}&songBook=${"custom"}`, true);
-    console.log(xHttp);
-    xHttp.send(null);
+createCustom.addEventListener('click', (e) => {
+    lineSets = newCustomTemplate
+    openEditMode();
+    oldTitle = undefined;
 });
 
  function showlineSetAt(index){
