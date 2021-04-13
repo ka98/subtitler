@@ -259,6 +259,12 @@ function addTableRow(editable, id, text1, text2, inLoop) {
         cell0.onkeydown = (e) => {
             e = e || window.event;
             switch (e.key) {
+                case "Backspace":
+                    if(cursor_position() === 0){
+                        let row = e.target.parentNode.parentNode;
+                        row.parentNode.removeChild(row);
+                    }
+                    break;
                 case "Enter":
                     e.preventDefault();
                     break;
@@ -279,6 +285,15 @@ function addTableRow(editable, id, text1, text2, inLoop) {
     if(editable && !inLoop){
         textfield1.focus();
     }
+}
+
+function cursor_position() {
+    var sel = document.getSelection();
+    sel.modify("extend", "backward", "paragraphboundary");
+    var pos = sel.toString().length;
+    if(sel.anchorNode != undefined) sel.collapseToEnd();
+
+    return pos;
 }
 
 function openEditMode(){
