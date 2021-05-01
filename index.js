@@ -84,6 +84,32 @@ const fnServerCallBack = (req,res) => {
                     break;
                 }
             }
+        } else if (query.newCustom !== undefined) {
+            if(query.oldTitle !== 'undefined'){
+                for(let i = 0; i < customLines.length; i++){
+                    if(customLines[i].title === query.oldTitle){
+                        customLines[i] = JSON.parse(query.newCustom);
+                        break;
+                    }
+                }
+            } else {
+                let newCustom = JSON.parse(query.newCustom)
+                for(let i = 0; i < customLines.length; i++){
+                    if(customLines[i].title === newCustom.title){
+                        res.setHeader("Content-type", "text/html");
+                        res.write("ERROR: Ttile must be unique!");
+                        res.end();
+                        return;
+                    }
+                }
+                customLines.push(newCustom);
+                fs.writeFileSync(resourcesFolder + 'Custom.json', JSON.stringify(customLines, null, 2));
+
+                res.statusCode = 200;
+                res.setHeader("Content-type", "text/html");
+                res.write("SUCCESS: wrote new Custom to disk!");
+                res.end();
+            }
         } else {
             res.write(JSON.stringify(createLinesetsFromSong(query.songNumber, query.songBook)));
         }
