@@ -26,9 +26,19 @@
     </div>
     <div class="textbox">
         <label for="songNumber">songNumber</label>
-        <input type="text" id="songNumber" name="songNumber required style="display: inline">
+        <input type="text" id="songNumber" name="songNumber">
     </div>
     <input type="button" value="request Song" id="requestSong">
+
+    <div class="textbox">
+        <label for="customLines">custom Linesets</label>
+        <input list="autoComplete" type="text" id="customLineset" name="customLineset">
+        <datalist id="autoComplete" name="autoComplete">
+        </datalist>
+    </div>
+    <input type="button" value="request custom" id="requestCustom">
+    <input type="button" value="edit custom" id="editCustom">
+    <input type="button" value="create new custom" id="createCustom">
 
     <table id="lines">
         <tr>

@@ -10,7 +10,10 @@
   "license": "UNLICENSED",
   "dependencies": {
     "casparcg-connection": "^5.0.1",
+    "open": "^8.0.4",
     "telnet-client": "^1.4.6",
-    "tslib": "^2.0.3"
+    "tslib": "^2.0.3",
+    "wait-console-input": "^0.1.7",
+    "websocket": "^1.0.34"
   }
 }
