@@ -13,28 +13,26 @@ let currentSong;
 let currentVerse;
 let currentSongbook;
 
-// const os = require("os");
-// let input;
-// const interfaces = os.networkInterfaces();
-// const addresses = [];
-// while (address == undefined){
-//     console.clear();
-//     console.log("Choose Network Interface: \n");
-//     let i = 1; 
-//     for(let interface in interfaces){
-//         console.log(`[${i}] ${interface} ${interfaces[interface][interfaces[interface].length-1].cidr}`);
-//         addresses.push(interfaces[interface][interfaces[interface].length-1].address);
-//         i++; 
-//     }
+const os = require("os");
+let input;
+const interfaces = os.networkInterfaces();
+const addresses = [];
+while (address == undefined){
+    console.clear();
+    console.log("Choose Network Interface: \n");
+    let i = 1; 
+    for(let interface in interfaces){
+        console.log(`[${i}] ${interface} ${interfaces[interface][interfaces[interface].length-1].cidr}`);
+        addresses.push(interfaces[interface][interfaces[interface].length-1].address);
+        i++; 
+    }
 
-//     const inputReader = require('wait-console-input')
-//     input = inputReader.readInteger('');
-//     address = addresses[parseInt(input) - 1];
-// }
+    const inputReader = require('wait-console-input')
+    input = inputReader.readInteger('');
+    address = addresses[parseInt(input) - 1];
+}
 
 address = "127.0.0.1";
-// address = "192.168.1.159";
-// address = "192.168.178.38";
 const port = "3000";
 
 const fnServerCallBack = (req,res) => {

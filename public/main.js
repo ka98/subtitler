@@ -10,14 +10,61 @@ const fmb = document.getElementById("FMB");
 const autocomplete = document.getElementById("autoComplete");
 const requestCustom = document.getElementById("requestCustom");
 const editCustom = document.getElementById("editCustom");
-const createNewCustom = document.getElementById("createNewCustom");
+const createCustom = document.getElementById("createCustom");
 const customLineset = document.getElementById("customLineset");
+const save = document.getElementById("save");
 
+let oldTitle = '';
 let currentLine = 0;
 let lineSets = null;
 let highlight = null
 
+newCustomTemplate = [
+    {
+      "line1": "",
+      "line2": ""
+    },
+    {
+      "line1": "",
+      "line2": ""
+    },
+    {
+      "line1": "",
+      "line2": ""
+    }
+]
+
 fillAutoComplete();
+
+save.addEventListener('click', (e) => {
+    let custom = {
+        "title": customLineset.value,
+        "lines": []
+    }
+    for(let i = 1; i < table.rows.length; i++){
+        let lineSet =  {
+            "line1": "",
+            "line2": ""
+        };
+        lineSet.line1 = table.rows[i].cells[0].getElementsByTagName("SPAN")[0].innerText
+        lineSet.line2 = table.rows[i].cells[1].getElementsByTagName("SPAN")[0].innerText
+        custom.lines.push(lineSet);
+    }
+
+    console.log(custom);
+
+    let xHttp = new XMLHttpRequest();
+    xHttp.onreadystatechange = () => {
+      if (xHttp.readyState === 4 && xHttp.status === 200){
+          console.log(xHttp.responseText);
+          fillAutoComplete();
+      }
+    };
+    xHttp.open("GET", `?oldTitle=${oldTitle}&newCustom=${JSON.stringify(custom)}`, true);
+    console.log(xHttp);
+    xHttp.send(null);
+
+});
 
 submit.addEventListener('click', (e) => {
    let xHttp = new XMLHttpRequest();
@@ -38,7 +85,7 @@ requestSong.addEventListener('click', (e) => {
           console.log(xHttp.responseText);
           clearList();
           lineSets = JSON.parse(xHttp.responseText);
-          fillList();
+          fillList(false);
       }
     };
     let book = "";
@@ -54,14 +101,28 @@ requestSong.addEventListener('click', (e) => {
     xHttp.send(null);
 });
 
+editCustom.addEventListener('click', (e) => {
+    let xHttp = new XMLHttpRequest();
+    xHttp.onreadystatechange = () => {
+      if (xHttp.readyState === 4 && xHttp.status === 200){
+          console.log(xHttp.responseText);
+          lineSets = JSON.parse(xHttp.responseText);
+          openEditMode();
+      }
+    };
+    oldTitle = customLineset.value;
+    xHttp.open("GET", `?songNumber=${customLineset.value}&songBook=${"custom"}`, true);
+    console.log(xHttp);
+    xHttp.send(null);
+});
+
 requestCustom.addEventListener('click', (e) => {
     let xHttp = new XMLHttpRequest();
     xHttp.onreadystatechange = () => {
       if (xHttp.readyState === 4 && xHttp.status === 200){
           console.log(xHttp.responseText);
-          clearList();
           lineSets = JSON.parse(xHttp.responseText);
-          fillList();
+          closeEditMode()
       }
     };
     xHttp.open("GET", `?songNumber=${customLineset.value}&songBook=${"custom"}`, true);
@@ -84,19 +145,10 @@ songNumber.addEventListener("keydown", (e) => {
     }
 });
 
-createNewCustom.addEventListener('click', (e) => {
-    let xHttp = new XMLHttpRequest();
-    xHttp.onreadystatechange = () => {
-      if (xHttp.readyState === 4 && xHttp.status === 200){
-          console.log(xHttp.responseText);
-          clearList();
-          lineSets = JSON.parse(xHttp.responseText);
-          fillList();
-      }
-    };
-    xHttp.open("GET", `?songNumber=${customLineset.value}&songBook=${"custom"}`, true);
-    console.log(xHttp);
-    xHttp.send(null);
+createCustom.addEventListener('click', (e) => {
+    lineSets = newCustomTemplate
+    openEditMode();
+    oldTitle = undefined;
 });
 
  function showlineSetAt(index){
@@ -140,35 +192,14 @@ createNewCustom.addEventListener('click', (e) => {
     xHttp.send(null);
  }
 
- function fillList(){
+ function fillList(editable){
     let id=0
     lineSets.forEach( (lineSet) => {
-
-        let row = table.insertRow(id + 1);
-        let cell0 = row.insertCell(0);
-
-        let textfield1 = document.createElement("span");
-        textfield1.setAttribute("type", "text");
-        textfield1.readOnly = true;
-        textfield1.contentEditable = false;
-        textfield1.innerText = lineSet.line1;
-
-        let textfield2 = document.createElement("span");
-        textfield2.setAttribute("type", "text");
-        textfield2.readOnly = true;
-        textfield2.contentEditable = false;
-        textfield2.innerText = lineSet.line2;
-
-        cell0.appendChild(textfield1);
-        let cell1 = row.insertCell(1);
-        cell1.appendChild(textfield2);
-        
-        row.addEventListener('click', (e) => {
-            showlineSetAt(e.path[1].rowIndex - 1);
-        });
-        
+        addTableRow(editable, id, lineSet.line1, lineSet.line2,true);
         id++;
     });
+
+    if(!editable) {
 
     document.onkeydown = (e) => {
         e = e || window.event;
@@ -186,7 +217,101 @@ createNewCustom.addEventListener('click', (e) => {
                 }
                 break;
         }
-     }
+    }
 
-     showlineSetAt(0);
+    showlineSetAt(0);
+    }
+}
+
+function addTableRow(editable, id, text1, text2, inLoop) {
+    let row = table.insertRow(id + 1);
+    let cell0 = row.insertCell(0);
+    let cell1 = row.insertCell(1);
+
+    let textfield1 = document.createElement("span");
+    textfield1.setAttribute("type", "text");
+    textfield1.readOnly = !editable;
+    textfield1.contentEditable = editable;
+    textfield1.innerText = text1;
+
+    let textfield2 = document.createElement("span");
+    textfield2.setAttribute("type", "text");
+    textfield2.readOnly = !editable;
+    textfield2.contentEditable = editable;
+    textfield2.innerText = text2;
+
+    cell0.appendChild(textfield1);
+    cell1.appendChild(textfield2);
+
+    if(!editable){        
+
+        row.addEventListener('click', (e) => {
+            showlineSetAt(e.path[1].rowIndex - 1);
+        });
+
+    } else {
+        let cell2 = row.insertCell(2);
+        let deleteLine = document.createElement("button");
+        deleteLine.textContent = 'X';
+        deleteLine.addEventListener('click', (e) => {
+            let row = e.target.parentNode.parentNode;
+            if(table.rows.length === 2) {
+                row.cells[0].getElementsByTagName("SPAN")[0].innerText = '';
+                row.cells[1].getElementsByTagName("SPAN")[0].innerText = '';
+            } else {
+                row.parentNode.removeChild(row);   
+            }
+        });
+        cell2.appendChild(deleteLine);
+
+        cell0.onkeydown = (e) => {
+            e = e || window.event;
+            switch (e.key) {
+                case "Backspace":
+                    if(cursor_position() === 0){
+                        let row = e.target.parentNode.parentNode;
+                        row.parentNode.removeChild(row);
+                    }
+                    break;
+                case "Enter":
+                    e.preventDefault();
+                    break;
+            }
+        }
+        cell1.onkeydown = (e) => {
+            e = e || window.event;
+            switch (e.key) {
+                case "Enter":
+                    e.preventDefault();
+                    //if(e.target.parentNode.parentNode.rowIndex === table.rows.length - 1) { //if Enter was hit on the last Tablerow
+                        addTableRow(true, e.target.parentNode.parentNode.rowIndex, '', '', false);
+                    //}
+                    break;
+            }
+        }
+    }
+    if(editable && !inLoop){
+        textfield1.focus();
+    }
+}
+
+function cursor_position() {
+    var sel = document.getSelection();
+    sel.modify("extend", "backward", "paragraphboundary");
+    var pos = sel.toString().length;
+    if(sel.anchorNode != undefined) sel.collapseToEnd();
+
+    return pos;
+}
+
+function openEditMode(){
+    save.style.display = 'inline';
+    clearList();
+    fillList(true);
+}
+
+function closeEditMode(){
+    save.style.display = 'none';
+    clearList();
+    fillList(false);
 }

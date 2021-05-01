@@ -57,7 +57,11 @@ fieldset legend{
     /*border: 1px black solid;*/
 /* } */
 
-#lines td{
+#save{
+    display: none;
+}
+
+td{
     height: 20px;
 }
 
