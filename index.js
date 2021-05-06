@@ -32,6 +32,7 @@ while (address == undefined){
     address = addresses[parseInt(input) - 1];
 }
 
+// address = "192.168.1.159";
 address = "127.0.0.1";
 const port = "3000";
 
@@ -116,7 +117,7 @@ const fnServerCallBack = (req,res) => {
         if (WSConnections) {
             let aSongInfo = getVersesFromSong(query.songNumber, query.songBook);
             if (aSongInfo.length > 0) {
-                WSConnections.emit('message',JSON.stringify({ type: "completeSong" , song: aSongInfo }));
+                WSConnections.emit('message',JSON.stringify({ type: "completeSong", songNumber: query.songNumber, song: aSongInfo }));
             }
         }
         res.end();
@@ -136,7 +137,7 @@ WSConnections.on('connect', () => {
     if (currentSong) {
         let aSongInfo = getVersesFromSong(currentSong, currentSongbook);
         if (aSongInfo.length > 0) {
-            WSConnections.emit('message', JSON.stringify({ type: "completeSong" , song: aSongInfo }));
+            WSConnections.emit('message', JSON.stringify({ type: "completeSong", songNumber: query.songNumber, song: aSongInfo }));
         }
     }
     if (currentVerse) {

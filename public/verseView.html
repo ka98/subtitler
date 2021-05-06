@@ -9,8 +9,11 @@
             left:-50%;
             position: relative;
         }
+        h1{
+            font-size: 3.5rem;
+        }
         h2 {
-            font-size: 2.5rem;
+            font-size: 1.5rem;
         }
         #verse tr {
             font-size: 4.5rem;
@@ -20,6 +23,7 @@
 <body style="background-color: black; color: white; font-family: 'Times New Roman', Times, serif;">
     <script>
         let webSocket;
+        let sCurrentSong;
         let aSong = [];
         async function connectWebSocket() {
             return new Promise(async (resolve, reject) => {
@@ -39,10 +43,17 @@
 
         function showVerse(versNum){
             const table = document.getElementById("verse");
+            const headerNumber = document.getElementsByTagName("h1")[0];
             const header = document.getElementsByTagName("h2")[0];
             let oVerse = aSong.find(oSong => oSong.versNumber === versNum);
             if (!oVerse) return;
-            header.innerHTML = `${ versNum } von ${ aSong.filter(oVerse => !isNaN(parseInt(oVerse.versNumber,10))).length }`;
+            headerNumber.innerHTML = sCurrentSong;
+            if (!isNaN(parseInt(oVerse.versNumber, 10))) {
+                header.innerHTML = `${ versNum } von ${ aSong.filter(oVerse => !isNaN(parseInt(oVerse.versNumber,10))).length }`;
+            }
+            else {
+                header.innerHTML = versNum;
+            }
             table.childNodes.forEach(oChild => {
                 table.removeChild(oChild);
             });
@@ -71,7 +82,8 @@
                 if (event.data.substr(0,1) !== "{") return;
                 const oMsg = JSON.parse(event.data);
                 if (oMsg.type === "completeSong") {
-                    aSong = oMsg.song;
+                    aSong        = oMsg.song;
+                    sCurrentSong = oMsg.songNumber;
                 }
                 else if (oMsg.type === "switchVerse") {
                     showVerse(oMsg.versNumber);
@@ -81,7 +93,7 @@
 
         connectWebSocket().then(registerOnMessage);
     </script>
-    <h2></h2>
+    <h1></h1><br/><h2></h2>
     <div style="position: absolute; left: 50%; bottom: 1rem; width: 100%">
     <table id="verse">
         <tr>
