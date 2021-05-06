@@ -137,7 +137,7 @@ WSConnections.on('connect', () => {
     if (currentSong) {
         let aSongInfo = getVersesFromSong(currentSong, currentSongbook);
         if (aSongInfo.length > 0) {
-            WSConnections.emit('message', JSON.stringify({ type: "completeSong", songNumber: query.songNumber, song: aSongInfo }));
+            WSConnections.emit('message', JSON.stringify({ type: "completeSong", songNumber: currentSong, song: aSongInfo }));
         }
     }
     if (currentVerse) {
