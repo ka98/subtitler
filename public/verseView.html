@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Verse View</title>
+    <style>
+        #verse {
+            margin: auto;
+            left:-50%;
+            position: relative;
+        }
+        h1{
+            font-size: 3.5rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        #verse tr {
+            font-size: 4.5rem;
+        }
+    </style>
+</head>
+<body style="background-color: black; color: white; font-family: 'Times New Roman', Times, serif;">
+    <script>
+        let webSocket;
+        let sCurrentSong;
+        let aSong = [];
+        async function connectWebSocket() {
+            return new Promise(async (resolve, reject) => {
+                let webSocket = new WebSocket("ws://" + location.host, ["echo-protocol"]);
+                webSocket.onopen = (event) => {
+                    webSocket.send("hey there");
+                    resolve(webSocket);
+                }
+                webSocket.onclose = () => {
+                    setTimeout(async () => {
+                        webSocket = await connectWebSocket(); // try to connect again
+                        registerOnMessage(webSocket);
+                    }, 1000);
+                };
+            });
+        }
+
+        function showVerse(versNum){
+            const table = document.getElementById("verse");
+            const headerNumber = document.getElementsByTagName("h1")[0];
+            const header = document.getElementsByTagName("h2")[0];
+            let oVerse = aSong.find(oSong => oSong.versNumber === versNum);
+            if (!oVerse) return;
+            headerNumber.innerHTML = sCurrentSong;
+            if (!isNaN(parseInt(oVerse.versNumber, 10))) {
+                header.innerHTML = `${ versNum } von ${ aSong.filter(oVerse => !isNaN(parseInt(oVerse.versNumber,10))).length }`;
+            }
+            else {
+                header.innerHTML = versNum;
+            }
+            table.childNodes.forEach(oChild => {
+                table.removeChild(oChild);
+            });
+            let id=0
+            oVerse.lines.forEach( (line) => {
+
+                let row = table.insertRow(id);
+                let cell0 = row.insertCell(0);
+
+                let textfield1 = document.createElement("span");
+                textfield1.setAttribute("type", "text");
+                textfield1.readOnly = true;
+                textfield1.contentEditable = false;
+                textfield1.innerText = line;
+
+                cell0.appendChild(textfield1);
+                
+                id++;
+            });
+        }
+
+        function registerOnMessage(webSocket) {
+
+            webSocket.onmessage = (event) => {
+                console.log(event.data);
+                if (event.data.substr(0,1) !== "{") return;
+                const oMsg = JSON.parse(event.data);
+                if (oMsg.type === "completeSong") {
+                    aSong        = oMsg.song;
+                    sCurrentSong = oMsg.songNumber;
+                }
+                else if (oMsg.type === "switchVerse") {
+                    showVerse(oMsg.versNumber);
+                }
+            }
+        }
+
+        connectWebSocket().then(registerOnMessage);
+    </script>
+    <h1></h1><br/><h2></h2>
+    <div style="position: absolute; left: 50%; bottom: 1rem; width: 100%">
+    <table id="verse">
+        <tr>
+        </tr>
+    </table>
+    </div>
+</body>
+</html>

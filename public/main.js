@@ -164,7 +164,8 @@ createCustom.addEventListener('click', (e) => {
             highlight.classList.add("highlight");
       }
     };
-    xHttp.open("GET", `?line1=${lineSets[index].line1}&line2=${lineSets[index].line2}`, true);
+    xHttp.open("GET", `?line1=${lineSets[index].line1}&line2=${lineSets[index].line2}${ 
+        lineSets[index].verse ? '&versNumber=' + lineSets[index].verse : '' }`, true);
     console.log(xHttp);
     xHttp.send(null);
  }
